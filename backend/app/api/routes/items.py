@@ -12,7 +12,11 @@ router = APIRouter(prefix="/items", tags=["items"])
 
 @router.get("/", response_model=ItemsPublic)
 def read_items(
-    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
+    session: SessionDep,
+    current_user: CurrentUser,
+    skip: int = 0,
+    limit: int = 100,
+    search: str = "",
 ) -> Any:
     """
     Retrieve items.
@@ -22,6 +26,8 @@ def read_items(
         count_statement = select(func.count()).select_from(Item)
         count = session.exec(count_statement).one()
         statement = select(Item).offset(skip).limit(limit)
+        if search:
+            statement = statement.where(Item.name.ilike(f"%{search}%"))
         items = session.exec(statement).all()
     else:
         count_statement = (
@@ -29,6 +35,8 @@ def read_items(
             .select_from(Item)
             .where(Item.owner_id == current_user.id)
         )
+        if search:
+            count_statement = count_statement.where(Item.name.ilike(f"%{search}%"))
         count = session.exec(count_statement).one()
         statement = (
             select(Item)
@@ -36,6 +44,8 @@ def read_items(
             .offset(skip)
             .limit(limit)
         )
+        if search:
+            statement = statement.where(Item.name.ilike(f"%{search}%"))
         items = session.exec(statement).all()
 
     return ItemsPublic(data=items, count=count)

@@ -1,6 +1,6 @@
 # FastAPI Project - Frontend
 
-The frontend is built with [Vite](https://vitejs.dev/), [React](https://reactjs.org/), [TypeScript](https://www.typescriptlang.org/), [TanStack Query](https://tanstack.com/query), [TanStack Router](https://tanstack.com/router) and [Chakra UI](https://chakra-ui.com/).
+The frontend is built with [Vite](https://vitejs.dev/), [Vue 3](https://vuejs.org/), [TypeScript](https://www.typescriptlang.org/), and other modern technologies.
 
 ## Frontend development
 
@@ -13,6 +13,7 @@ Before you begin, ensure that you have either the Node Version Manager (nvm) or 
 ```bash
 cd frontend
 ```
+
 * If the Node.js version specified in the `.nvmrc` file isn't installed on your system, you can install it using the appropriate command:
 
 ```bash
@@ -33,25 +34,31 @@ fnm use
 nvm use
 ```
 
-* Within the `frontend` directory, install the necessary NPM packages:
+* Within the `frontend` directory, install the necessary packages:
 
 ```bash
-npm install
+pnpm install
 ```
 
-* And start the live server with the following `npm` script:
+* Copy .env.example to .env and fill in the values:
 
 ```bash
-npm run dev
+cp .env.example .env
+```
+
+* Start the live server with the following script:
+
+```bash
+pnpm dev
 ```
 
 * Then open your browser at http://localhost:5173/.
 
-Notice that this live server is not running inside Docker, it's for local development, and that is the recommended workflow. Once you are happy with your frontend, you can build the frontend Docker image and start it, to test it in a production-like environment. But building the image at every change will not be as productive as running the local development server with live reload.
+Notice that this live server is not running inside Docker, it's for local development, and that is the recommended workflow. Once you are happy with your frontend, you can build the frontend Docker image and start it, to test it in a production-like environment.
 
 Check the file `package.json` to see other available options.
 
-### Removing the frontend
+## Removing the frontend
 
 If you are developing an API-only app and want to remove the frontend, you can do it easily:
 
@@ -94,7 +101,7 @@ But it would be only to clean them up, leaving them won't really have any effect
 * To generate the frontend client, run:
 
 ```bash
-npm run generate-client
+pnpm run generate-client
 ```
 
 * Commit the changes.
@@ -118,14 +125,14 @@ The frontend code is structured as follows:
 * `frontend/src` - The main frontend code.
 * `frontend/src/assets` - Static assets.
 * `frontend/src/client` - The generated OpenAPI client.
-* `frontend/src/components` -  The different components of the frontend.
-* `frontend/src/hooks` - Custom hooks.
-* `frontend/src/routes` - The different routes of the frontend which include the pages.
-* `theme.tsx` - The Chakra UI custom theme.
+* `frontend/src/components` - The different components of the frontend.
+* `frontend/src/stores` - Pinia stores for state management.
+* `frontend/src/views` - The different views/pages of the frontend.
+* `frontend/src/router` - Vue Router configuration.
 
 ## End-to-End Testing with Playwright
 
-The frontend includes initial end-to-end tests using Playwright. To run the tests, you need to have the Docker Compose stack running. Start the stack with the following command:
+The frontend includes end-to-end tests using Playwright. To run the tests, you need to have the Docker Compose stack running. Start the stack with the following command:
 
 ```bash
 docker compose up -d --wait backend
@@ -134,13 +141,17 @@ docker compose up -d --wait backend
 Then, you can run the tests with the following command:
 
 ```bash
-npx playwright test
+# Install browsers for the first run
+npx playwright install
+
+# Run the tests
+pnpm test:e2e
 ```
 
-You can also run your tests in UI mode to see the browser and interact with it running:
+You can also run your tests in UI mode:
 
 ```bash
-npx playwright test --ui
+pnpm test:e2e --debug
 ```
 
 To stop and remove the Docker Compose stack and clean the data created in tests, use the following command:
@@ -148,7 +159,5 @@ To stop and remove the Docker Compose stack and clean the data created in tests,
 ```bash
 docker compose down -v
 ```
-
-To update the tests, navigate to the tests directory and modify the existing test files or add new ones as needed.
 
 For more information on writing and running Playwright tests, refer to the official [Playwright documentation](https://playwright.dev/docs/intro).

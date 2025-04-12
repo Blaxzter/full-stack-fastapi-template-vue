@@ -1,5 +1,6 @@
 import secrets
 import warnings
+from pathlib import Path
 from typing import Annotated, Any, Literal
 
 from pydantic import (
@@ -15,6 +16,8 @@ from pydantic_core import MultiHostUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Self
 
+PROJECT_DIR = Path(__file__).parent.parent.parent.parent
+
 
 def parse_cors(v: Any) -> list[str] | str:
     if isinstance(v, str) and not v.startswith("["):
@@ -27,7 +30,7 @@ def parse_cors(v: Any) -> list[str] | str:
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         # Use top level .env file (one level above ./backend/)
-        env_file="../.env",
+        env_file=PROJECT_DIR / ".env",
         env_ignore_empty=True,
         extra="ignore",
     )

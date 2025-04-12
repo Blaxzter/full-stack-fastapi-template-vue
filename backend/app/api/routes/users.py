@@ -1,4 +1,5 @@
 import uuid
+from operator import or_
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -34,15 +35,25 @@ router = APIRouter(prefix="/users", tags=["users"])
     dependencies=[Depends(get_current_active_superuser)],
     response_model=UsersPublic,
 )
-def read_users(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_users(
+    session: SessionDep, skip: int = 0, limit: int = 100, search: str = ""
+) -> Any:
     """
     Retrieve users.
     """
 
     count_statement = select(func.count()).select_from(User)
+    if search:
+        count_statement = count_statement.where(
+            or_(User.email.ilike(f"%{search}%"), User.full_name.ilike(f"%{search}%"))
+        )
     count = session.exec(count_statement).one()
 
     statement = select(User).offset(skip).limit(limit)
+    if search:
+        statement = statement.where(
+            or_(User.email.ilike(f"%{search}%"), User.full_name.ilike(f"%{search}%"))
+        )
     users = session.exec(statement).all()
 
     return UsersPublic(data=users, count=count)
